@@ -1,5 +1,6 @@
 import { useUserContext } from "../Contexts/UserContext";
 import { BASEURL, SIGN_OUT } from "../../Constants";
+import UpdateUser from "./UpdateUser";
 
 const LogoutPopUp = () => {
   const { showLogout, setShowLogout, setIsAuth, setCurrLoggedUser } =
@@ -12,7 +13,7 @@ const LogoutPopUp = () => {
         console.log(data);
         handleCloseLogoutPopUp();
         setIsAuth(false);
-        setCurrLoggedUser({});
+        setCurrLoggedUser(null);
       })
       .catch((err) => console.log(err));
   };
@@ -21,11 +22,14 @@ const LogoutPopUp = () => {
 
   return (
     <div className="absolute z-40 left-1/2 -translate-x-1/2 flex min-h-screen w-[500px] items-center justify-center p-4 text-xl ">
-      <div className="w-full max-w-md p-8  space-y-6 bg-white rounded-xl ">
+      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-xl relative">
+        {" "}
+        {/* Relative positioning for container */}
+        {/* Cross Icon to Close Popup */}
+        <UpdateUser handleCloseLogoutPopUp={handleCloseLogoutPopUp} />
         <h2 className="text-2xl font-bold text-center text-gray-800 -pt-4">
-          Do you want to logout ?
+          Do you want to logout?
         </h2>
-
         <div className="flex justify-center items-center gap-4 ">
           <button
             onClick={handleLogoutUser}

@@ -27,7 +27,8 @@ const Chat = () => {
     []
   );
 
-  const { isAuth, setIsAuth, showLogout, setCurrLoggedUser } = useUserContext();
+  const { isAuth, setIsAuth, showLogout, currLoggedUser, setCurrLoggedUser } =
+    useUserContext();
 
   // Handle opening and closing the pop-up
   const handleOpenPopup = () => setIsPopupOpen(true);
@@ -62,6 +63,8 @@ const Chat = () => {
     try {
       const data = await decodeTokenAPI();
 
+      console.log("data -> ", data);
+
       setCurrLoggedUser(data);
       setIsAuth(true);
     } catch (error) {
@@ -86,7 +89,9 @@ const Chat = () => {
       {/* Render the popup */}
       {isPopupOpen && (
         <ChatUserSelectionPopup
-          users={allusers}
+          users={allusers.filter(
+            (user: UserInterface) => user._id !== currLoggedUser?._id
+          )}
           onClose={handleClosePopup}
           // onSelectUsers={handleSelectUsers}
         />

@@ -1,5 +1,5 @@
 import { UserInterface } from "@/Interfaces/userInterface";
-import { BASEURL } from "../../Constants";
+
 import { useState } from "react";
 import { useUserContext } from "@/Contexts/UserContext";
 
@@ -64,7 +64,7 @@ const ChatUserSelectionPopup: React.FC<ChatUserSelectionProps> = ({
                     className="flex bg-cyan-500 gap-2 items-center p-2 pr-4 rounded-full"
                   >
                     <img
-                      src={`${BASEURL}${user?.avatar}`}
+                      src={user.avatar.url}
                       alt="img"
                       className={`w-10 h-10 rounded-full `}
                     />
@@ -97,7 +97,7 @@ const ChatUserSelectionPopup: React.FC<ChatUserSelectionProps> = ({
               >
                 <div className="flex  items-center gap-3">
                   <img
-                    src={`${BASEURL}${user?.avatar}`}
+                    src={user.avatar.url}
                     alt="img"
                     className={`w-10 h-10 rounded-full `}
                   />

@@ -1,9 +1,9 @@
 import { useToast } from "../hooks/use-toast";
-import { signInService } from "@/Services/authServices";
-import { handleFormSubmit } from "@/Utils/formUtils";
+
 import { useUserContext } from "../Contexts/UserContext";
 
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { BASEURL, SIGN_IN } from "../../Constants";
 
 interface SignInProps {
   showPassword: boolean;
@@ -16,11 +16,27 @@ const SignIn = ({ showPassword, setShowPassword }: SignInProps) => {
   const { setIsAuth } = useUserContext();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    const formatedData = handleFormSubmit(e);
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+    const signinData: { [key: string]: string } = {};
+    formData.forEach((val, key) => (signinData[key] = val.toString()));
     try {
-      const result = await signInService(formatedData);
-
-      if (result.ok) {
+      const result = await fetch(`${BASEURL}/api/${SIGN_IN}`, {
+        body: JSON.stringify(signinData),
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!result.ok) {
+        const { message } = await result.json();
+        toast({
+          variant: "destructive",
+          title: message,
+        });
+        setIsAuth(false);
+      } else {
         toast({
           title: "Successfully signed in",
         });
@@ -29,7 +45,7 @@ const SignIn = ({ showPassword, setShowPassword }: SignInProps) => {
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "please enter the correct username and password",
+        title: "Network error",
       });
       setIsAuth(false);
       console.log("Error during sign-up: ", error);

@@ -1,14 +1,14 @@
 import { SetStateAction } from "react";
 
 export type UserInterface = {
-  avatar: string;
+  avatar: { url: string; public_id: string };
   userName: string;
   email: string;
   _id: string;
 };
 export type CurrentUserInterface = {
   _id: string;
-  avatar: string;
+  avatar: { url: string; public_id: string };
   userName: string;
   email: string;
   iat: number;

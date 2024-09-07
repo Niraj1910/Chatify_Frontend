@@ -1,8 +1,12 @@
 import { useToast } from "../hooks/use-toast";
 import { signUpService } from "@/Services/authServices";
-import { handleFormSubmit } from "@/Utils/formUtils";
-import { useState } from "react";
+
+import { useRef, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import defaultProfile from "/defaultProfile.jpg";
+
+import ProfilePicture from "./ProfilePicture";
+import { BASEURL, SIGN_UP } from "../../Constants";
 
 interface SignUpProps {
   showPassword: boolean;
@@ -18,26 +22,51 @@ const SignUp = ({
   setIsSignUp,
 }: SignUpProps) => {
   const [validateUsername, setValidateUsername] = useState("");
+  const [imagePreview, setImagePreview] = useState(defaultProfile);
 
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    const response = handleFormSubmit(e);
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+
+    // check if the file is selected
+    if (!fileInputRef.current?.files?.[0]) {
+      const response = await fetch(defaultProfile);
+      const blob = await response.blob();
+      const defaultFile = new File([blob], "defaultProfile.jpg", {
+        type: blob.type,
+      });
+
+      formData.append("avatar", defaultFile);
+    }
+
+    formData.forEach((val, key) => console.log(key, " ", val));
     // doing a Fetch call
     try {
-      const result = await signUpService(response);
-      console.log("signUpData result -> ", result);
+      const response = await fetch(`${BASEURL}/api/${SIGN_UP}`, {
+        body: formData,
+        method: "POST",
+        credentials: "include",
+      });
 
-      if (result) {
+      if (!response.ok) {
+        const { message } = await response.json();
+        toast({
+          variant: "destructive",
+          title: message,
+        });
+      } else {
         setIsSignUp(!isSignUp);
         toast({
-          title: "Successfully Signed up, now please sign in",
+          title: "Successfully signed up",
         });
       }
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Something went wrong, please try again",
+        title: "Network error",
       });
       console.log("Error during sign-up: ", error);
     }
@@ -45,6 +74,11 @@ const SignUp = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <ProfilePicture
+        imagePreview={imagePreview}
+        setImagePreview={setImagePreview}
+        fileInputRef={fileInputRef}
+      />
       <input
         type="text"
         name="userName"

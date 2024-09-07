@@ -5,5 +5,6 @@ const SIGN_IN = "sign-in";
 const SIGN_UP = "sign-up";
 const USERS = "users";
 const DECODE_TOKEN = "decode-token";
+const UPDATE = "update";
 
-export { SIGN_IN, SIGN_OUT, SIGN_UP, BASEURL, USERS, DECODE_TOKEN };
+export { SIGN_IN, SIGN_OUT, SIGN_UP, BASEURL, USERS, DECODE_TOKEN, UPDATE };
