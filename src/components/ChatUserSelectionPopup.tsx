@@ -1,7 +1,7 @@
+import { useUserContext } from "../hooks/useUserContext";
 import { UserInterface } from "@/Interfaces/userInterface";
 
 import { useState } from "react";
-import { useUserContext } from "@/Contexts/UserContext";
 
 interface ChatUserSelectionProps {
   users: UserInterface[];

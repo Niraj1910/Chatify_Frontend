@@ -1,4 +1,4 @@
-import { useUserContext } from "../Contexts/UserContext";
+import { useUserContext } from "../hooks/useUserContext";
 import { BASEURL, SIGN_OUT } from "../../Constants";
 import UpdateUser from "./UpdateUser";
 

@@ -3,10 +3,10 @@ import { FaChevronDown, FaPenToSquare } from "react-icons/fa6";
 
 import { IoSearch } from "react-icons/io5";
 
-import { useUserContext } from "../Contexts/UserContext";
-
 import { UserInterface } from "../Interfaces/userInterface";
 import { useState } from "react";
+import UsersCard from "./UsersCard";
+import { useUserContext } from "../hooks/useUserContext";
 
 interface UserProps {
   allUsers: UserInterface[];
@@ -23,17 +23,17 @@ const Users: React.FC<UserProps> = ({ allUsers, handleOpenPopup }) => {
     user.userName.toLocaleLowerCase().includes(searchQuery.toLocaleLowerCase())
   );
 
-  console.log("currLoggedUser -> ", currLoggedUser);
+  console.log("allUsers -> ", allUsers);
 
   return (
-    <aside className="w-[30%] border-r-2 border-gray-900 bg-slate-950 h-full">
-      <div className="bg-black border-b-pink-500 border-b-2 h-[125px]">
+    <aside className="w-[30%] h-full border-r-2 border-gray-900 bg-slate-950 ">
+      <div className="bg-black border-b-pink-500 border-b-2 h-[13%]">
         <h1 className="text-7xl font-playfair  font-bold bg-gradient-to-r from-pink-600 to-fuchsia-500 bg-clip-text text-transparent leading-tight p-5 ">
           Chatify
         </h1>
       </div>
       {/* current user header */}
-      <div className="flex flex-col items-start justify-between px-4 h-20 gap-8 my-20">
+      <div className="flex flex-col items-start justify-between px-4 h-[8%] gap-8 my-20">
         <div className="flex justify-between w-full items-center font-bold text-xl">
           {currLoggedUser && (
             <>
@@ -73,54 +73,28 @@ const Users: React.FC<UserProps> = ({ allUsers, handleOpenPopup }) => {
 
       <h1 className="ml-5 mb-6 font-bold text-xl">Messages</h1>
 
-      {filterUsers.length
-        ? filterUsers.map((user) => (
-            <div
-              onClick={() => setConversationUsers([user])}
-              key={user._id}
-              className="flex justify-between items-center px-4 h-20 border-b-[1px] border-gray-950 cursor-pointer hover:bg-zinc-900 transition-colors duration-200"
-            >
-              <div className="flex  items-center gap-3">
-                <img
-                  src={user?.avatar.url}
-                  alt="img"
-                  className={`w-10 h-10 rounded-full `}
-                />
-
-                <p className="flex flex-col">
-                  <span className="text-lg">{user.userName}</span>
-                  {/* <span className="text-gray-200">{user?.lastMsg}</span> */}
-                </p>
-              </div>
-              {/* <p>{user?.lastSeen}</p> */}
-            </div>
-          ))
-        : null}
-      {!filterUsers.length
-        ? allUsers.length
-          ? allUsers.map((user) => (
-              <div
-                onClick={() => setConversationUsers([user])}
+      <div className="h-[51%] overflow-y-scroll scrollbar-hide">
+        {filterUsers.length
+          ? filterUsers.map((user) => (
+              <UsersCard
                 key={user._id}
-                className="flex justify-between items-center px-4 h-20 border-b-[1px] border-gray-950 cursor-pointer hover:bg-zinc-900 transition-colors duration-200"
-              >
-                <div className="flex  items-center gap-3">
-                  <img
-                    src={user?.avatar.url}
-                    alt="img"
-                    className={`w-10 h-10 rounded-full `}
-                  />
-
-                  <p className="flex flex-col">
-                    <span className="text-lg">{user.userName}</span>
-                    {/* <span className="text-gray-200">{user?.lastMsg}</span> */}
-                  </p>
-                </div>
-                {/* <p>{user?.lastSeen}</p> */}
-              </div>
+                setConversationUsers={setConversationUsers}
+                user={user}
+              />
             ))
-          : null
-        : null}
+          : null}
+        {!filterUsers.length
+          ? allUsers.length
+            ? allUsers.map((user) => (
+                <UsersCard
+                  key={user._id}
+                  setConversationUsers={setConversationUsers}
+                  user={user}
+                />
+              ))
+            : null
+          : null}
+      </div>
     </aside>
   );
 };

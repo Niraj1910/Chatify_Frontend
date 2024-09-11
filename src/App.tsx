@@ -1,5 +1,5 @@
 import Chat from "./components/Chat";
-import { UserContextProvider } from "./Contexts/UserContext";
+import { UserContextProvider } from "./contexts/UserContext";
 
 const App = () => {
   return (

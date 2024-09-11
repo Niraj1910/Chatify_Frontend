@@ -2,26 +2,19 @@ import { useEffect, useState } from "react";
 import Authentication from "./Authentication";
 import Messages from "./Messages";
 import Users from "./Users";
-import { useUserContext } from "../Contexts/UserContext";
+
 import LogoutPopUp from "./LogoutPopUp";
 import { decodeTokenAPI, fetchAllUsers } from "../Services/usersAPI";
 import ChatUserSelectionPopup from "./ChatUserSelectionPopup";
-import { UserInterface } from "@/Interfaces/userInterface";
-const demoUsers = [
-  { id: 1, userName: "JohnDoe" },
-  { id: 2, userName: "JaneSmith" },
-  { id: 3, userName: "MikeJohnson" },
-  { id: 4, userName: "EmilyDavis" },
-  { id: 5, userName: "DavidWilson" },
-  { id: 6, userName: "SophiaMoore" },
-  { id: 7, userName: "ChrisBrown" },
-  { id: 8, userName: "OliviaTaylor" },
-  { id: 9, userName: "JamesAnderson" },
-  { id: 10, userName: "LindaMartinez" },
-];
+import {
+  CurrentUserInterface,
+  UserInterface,
+} from "@/Interfaces/userInterface";
+import { useUserContext } from "../hooks/useUserContext";
+import { socket } from "@/socket";
 
 const Chat = () => {
-  const [allusers, setAllUsers] = useState([]);
+  const [allusers, setAllUsers] = useState<UserInterface[]>([]);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedChatUsers, setSelectedChatUsers] = useState<UserInterface[]>(
     []
@@ -41,17 +34,19 @@ const Chat = () => {
   //   console.log("Selected Users for Chat:", selectedUsers);
   // };
 
-  const loadAllUsers = async () => {
+  const loadAllUsers = async (skipUser: CurrentUserInterface) => {
     try {
       const response = await fetchAllUsers();
-
-      console.log(response);
 
       if (!response.ok) setIsAuth(false);
       else {
         const data = await response.json();
 
-        setAllUsers(data);
+        setAllUsers(() => {
+          return data.filter(
+            (user: { [key: string]: string }) => user._id !== skipUser._id
+          );
+        });
         setIsAuth(true);
       }
     } catch (error) {
@@ -63,19 +58,45 @@ const Chat = () => {
     try {
       const data = await decodeTokenAPI();
 
-      console.log("data -> ", data);
-
       setCurrLoggedUser(data);
       setIsAuth(true);
+      return data;
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    fetchDecodedUserToken();
-    loadAllUsers();
+    const firstFetchCall = async () => {
+      const skipUser = await fetchDecodedUserToken();
+      loadAllUsers(skipUser);
+    };
+    firstFetchCall();
   }, [isAuth]);
+
+  useEffect(() => {
+    socket.connect();
+    if (currLoggedUser?.userName) {
+      console.log("Joining with username:", currLoggedUser.userName);
+      socket.emit("join", currLoggedUser._id);
+    }
+
+    socket.on("online-users", (onlineUsers) => {
+      console.log("onlineUsers -> ", onlineUsers);
+
+      setAllUsers((prevAllUsers) =>
+        prevAllUsers.map((user) => ({
+          ...user,
+          isOnline: onlineUsers.hasOwnProperty(user._id),
+        }))
+      );
+    });
+
+    return () => {
+      socket.disconnect();
+      socket.off("join");
+    };
+  }, [currLoggedUser]);
 
   return (
     <section>
@@ -89,25 +110,25 @@ const Chat = () => {
       {/* Render the popup */}
       {isPopupOpen && (
         <ChatUserSelectionPopup
-          users={allusers.filter(
-            (user: UserInterface) => user._id !== currLoggedUser?._id
-          )}
+          users={allusers}
           onClose={handleClosePopup}
           // onSelectUsers={handleSelectUsers}
         />
       )}
 
-      <div
-        className={`absolute w-screen h-screen flex text-white ${
-          (!isAuth || showLogout) && "blur-sm pointer-events-none"
-        }`}
-      >
-        {/* display all users */}
-        <Users allUsers={allusers} handleOpenPopup={handleOpenPopup} />
+      {allusers.length && (
+        <div
+          className={`absolute w-screen h-screen flex text-white ${
+            (!isAuth || showLogout) && "blur-sm pointer-events-none"
+          }`}
+        >
+          {/* display all users */}
+          <Users allUsers={allusers} handleOpenPopup={handleOpenPopup} />
 
-        {/* display all messages */}
-        <Messages handleOpenPopup={handleOpenPopup} />
-      </div>
+          {/* display all messages */}
+          <Messages handleOpenPopup={handleOpenPopup} />
+        </div>
+      )}
     </section>
   );
 };

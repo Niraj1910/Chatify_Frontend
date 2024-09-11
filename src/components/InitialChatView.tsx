@@ -1,4 +1,4 @@
-import logo from "../../public/logo.svg";
+import logo from "/logo.svg";
 
 interface MessagesInterface {
   handleOpenPopup: () => void;

@@ -5,6 +5,7 @@ export type UserInterface = {
   userName: string;
   email: string;
   _id: string;
+  isOnline: boolean;
 };
 export type CurrentUserInterface = {
   _id: string;
