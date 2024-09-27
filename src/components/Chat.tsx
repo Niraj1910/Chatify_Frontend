@@ -1,27 +1,28 @@
 import { useEffect, useState } from "react";
-import Authentication from "./Authentication";
+
 import Messages from "./Messages";
 import Users from "./Users";
 
-import LogoutPopUp from "./LogoutPopUp";
-import { decodeTokenAPI, fetchAllUsers } from "../Services/usersAPI";
 import ChatUserSelectionPopup from "./ChatUserSelectionPopup";
-import {
-  CurrentUserInterface,
-  UserInterface,
-} from "@/Interfaces/userInterface";
+
 import { useUserContext } from "../hooks/useUserContext";
 import { socket } from "@/socket";
+import useChatContext from "../hooks/useChatContext";
+import { UserInterface } from "../Interfaces/userInterface";
 
-const Chat = () => {
-  const [allusers, setAllUsers] = useState<UserInterface[]>([]);
+interface ChatPropsInterface {
+  allusers: UserInterface[];
+}
+
+const Chat: React.FC<ChatPropsInterface> = ({ allusers }) => {
+  // const [allusers, setAllUsers] = useState<UserInterface[]>([]);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedChatUsers, setSelectedChatUsers] = useState<UserInterface[]>(
     []
   );
 
-  const { isAuth, setIsAuth, showLogout, currLoggedUser, setCurrLoggedUser } =
-    useUserContext();
+  const { isAuth, showLogout, currLoggedUser } = useUserContext();
+  const { setAllChats } = useChatContext();
 
   // Handle opening and closing the pop-up
   const handleOpenPopup = () => setIsPopupOpen(true);
@@ -34,48 +35,9 @@ const Chat = () => {
   //   console.log("Selected Users for Chat:", selectedUsers);
   // };
 
-  const loadAllUsers = async (skipUser: CurrentUserInterface) => {
-    try {
-      const response = await fetchAllUsers();
-
-      if (!response.ok) setIsAuth(false);
-      else {
-        const data = await response.json();
-
-        setAllUsers(() => {
-          return data.filter(
-            (user: { [key: string]: string }) => user._id !== skipUser._id
-          );
-        });
-        setIsAuth(true);
-      }
-    } catch (error) {
-      console.log("error -> ", error);
-    }
-  };
-
-  const fetchDecodedUserToken = async () => {
-    try {
-      const data = await decodeTokenAPI();
-
-      setCurrLoggedUser(data);
-      setIsAuth(true);
-      return data;
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   useEffect(() => {
-    const firstFetchCall = async () => {
-      const skipUser = await fetchDecodedUserToken();
-      loadAllUsers(skipUser);
-    };
-    firstFetchCall();
-  }, [isAuth]);
+    console.log(`currLoggedUser dependency sideEffect from Chat.tsx`);
 
-  useEffect(() => {
-    socket.connect();
     if (currLoggedUser?.userName) {
       console.log("Joining with username:", currLoggedUser.userName);
       socket.emit("join", currLoggedUser._id);
@@ -84,29 +46,39 @@ const Chat = () => {
     socket.on("online-users", (onlineUsers) => {
       console.log("onlineUsers -> ", onlineUsers);
 
-      setAllUsers((prevAllUsers) =>
-        prevAllUsers.map((user) => ({
+      function activeUsers(participants: UserInterface[]) {
+        return participants.map((user) => ({
           ...user,
           isOnline: onlineUsers.hasOwnProperty(user._id),
+        }));
+      }
+
+      setAllChats((prevChats) =>
+        prevChats.map((chat) => ({
+          ...chat,
+          participants: activeUsers(chat.participants),
         }))
       );
     });
 
     return () => {
-      socket.disconnect();
       socket.off("join");
+      socket.off("online-users");
     };
   }, [currLoggedUser]);
 
+  useEffect(() => {
+    console.log(`empty dependency sideEffect from Chat.tsx`);
+
+    socket.connect();
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
   return (
     <section>
-      {!isAuth && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
-          <Authentication />
-        </div>
-      )}
-
-      {showLogout && <LogoutPopUp />}
       {/* Render the popup */}
       {isPopupOpen && (
         <ChatUserSelectionPopup
