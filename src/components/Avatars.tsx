@@ -3,11 +3,9 @@ import { UserInterface } from "@/Interfaces/userInterface";
 const Avatars = ({
   persons,
   currLoggedUser,
-  setConversationUsers,
 }: {
   persons: UserInterface[];
   currLoggedUser: UserInterface | null;
-  setConversationUsers?: (arg: UserInterface[]) => void;
 }) => {
   const remainingPersons = persons.length - 3;
   persons = persons.filter((person, index) => {
@@ -15,12 +13,7 @@ const Avatars = ({
   });
 
   return (
-    <div
-      onClick={() => {
-        if (setConversationUsers) setConversationUsers(persons);
-      }}
-      className="flex items-center relative"
-    >
+    <div className="flex items-center relative">
       {persons?.map((person, index) =>
         persons?.length > 2 ? (
           <div

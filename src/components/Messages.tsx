@@ -1,15 +1,10 @@
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-
 import { IoIosSend } from "react-icons/io";
-
 import InitialChatView from "./InitialChatView";
-
-import { useUserContext } from "../hooks/useUserContext";
+import { useUserContext } from "@/Contexts/UserContext";
 import MessageNavbar from "./MessageNavbar";
-
 import MessagesCard from "./MessagesCard";
-
 import { useChatMessages } from "@/hooks/useChatMessages";
 
 const Messages = ({ handleOpenPopup }: { handleOpenPopup: () => void }) => {
@@ -24,9 +19,9 @@ const Messages = ({ handleOpenPopup }: { handleOpenPopup: () => void }) => {
     handleSendMessage,
   } = useChatMessages({ currLoggedUser, conversationUsers });
 
-  // console.log("conversationUsers -> ", conversationUsers);
+  console.log("conversationUsers -> ", conversationUsers);
   // console.log("messages => ", messages);
-  console.log(`chatState -> `, chatState?._id);
+  console.log(`chatState -> `, chatState);
 
   return (
     <>
@@ -34,7 +29,10 @@ const Messages = ({ handleOpenPopup }: { handleOpenPopup: () => void }) => {
         <InitialChatView handleOpenPopup={handleOpenPopup} />
       ) : (
         <main className="w-[70%] bg-slate-950 h-full p-10 flex flex-col justify-between">
-          <MessageNavbar conversationUsers={conversationUsers} />
+          <MessageNavbar
+            conversationUsers={conversationUsers}
+            isGroupChat={chatState?.isGroupChat}
+          />
           {messages?.length ? (
             <div
               ref={chatContainerRef}

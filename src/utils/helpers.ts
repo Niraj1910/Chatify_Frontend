@@ -65,4 +65,25 @@ const formatTheDate = (dateString: string) => {
   return `${day} ${month} ${year} ${hours}:${minutes}`;
 };
 
-export { timeAgo, extractUserNames, formatTheDate };
+const getFriendID = (arr: string[] | undefined, friend: string | undefined) => {
+  if (!arr || !friend) return "";
+  return (arr[0] === friend ? arr[1] : arr[0]).toString();
+};
+
+const closeTheMedia = (
+  localVideoRef: React.MutableRefObject<HTMLVideoElement | null>,
+  remoteVideoRef: React.MutableRefObject<HTMLVideoElement | null>
+) => {
+  if (localVideoRef.current && localVideoRef.current.srcObject) {
+    const stream = localVideoRef.current.srcObject as MediaStream;
+    stream.getTracks().forEach((track) => track.stop());
+    localVideoRef.current.srcObject = null;
+  }
+  if (remoteVideoRef.current && remoteVideoRef.current.srcObject) {
+    const stream = remoteVideoRef.current.srcObject as MediaStream;
+    stream.getTracks().forEach((track) => track.stop());
+    remoteVideoRef.current.srcObject = null;
+  }
+};
+
+export { timeAgo, extractUserNames, formatTheDate, getFriendID, closeTheMedia };

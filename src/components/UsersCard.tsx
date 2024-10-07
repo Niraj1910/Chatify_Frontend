@@ -1,57 +1,67 @@
-import { useUserContext } from "@/hooks/useUserContext";
 import { LastMessageInterface } from "@/Interfaces/chatUserInterface";
 import { UserInterface } from "@/Interfaces/userInterface";
 import React from "react";
 
 import { extractUserNames } from "@/utils/helpers";
 import Avatars from "./Avatars";
+import { useUserContext } from "@/Contexts/UserContext";
 
 interface UserCardProps {
-  setConversationUsers: (arg: UserInterface[]) => void;
   friends: UserInterface[];
   lastMessage: LastMessageInterface | null;
   chatId?: string | null;
-  setActiveChatId?: (arg: string) => void;
-  activeChatId?: string;
   isGroupChat: boolean;
+  activeChatId: string;
+  setUsers: (arg: UserInterface[]) => void;
 }
 
 const UsersCard: React.FC<UserCardProps> = ({
-  setConversationUsers,
   friends,
-  lastMessage,
   chatId,
-  setActiveChatId,
-  activeChatId,
+  lastMessage,
   isGroupChat,
+  activeChatId,
+  setUsers,
 }) => {
-  const { currLoggedUser } = useUserContext();
+  const { currLoggedUser, setConversationUsers } = useUserContext();
+
+  // let clickedChatId = "";
+
+  // const handleBtn = (conversationUsers: UserInterface[]) => {
+  //   clickedChatId = activeChatId;
+  // };
+
+  // const { activeChatId } = useChatMessages({
+  //   currLoggedUser,
+  //   conversationUsers: friends,
+  // });
 
   const displayUserNames = extractUserNames(friends, currLoggedUser);
 
-  const isClicked = () => {
-    if (chatId && setActiveChatId) setActiveChatId(chatId);
-  };
+  // const isClicked = () => {
+  //   if (chatId && setActiveChatId) setActiveChatId(chatId);
+  // };
+
+  // console.log("activeChatId ->", activeChatId, " ", "chatId -> ", chatId);
 
   return (
     (isGroupChat || lastMessage) && (
       <div
-        onClick={() => isClicked()}
+        // onClick={() => isClicked()}
+        // onClick={() => setConversationUsers(friends)}
+        // onClick={() => handleBtn(friends)}
+        onClick={() => {
+          setUsers(friends);
+          setConversationUsers(friends);
+        }}
         className={`flex justify-start items-center px-4 h-20 border-b-[1px] border-gray-950 hover:bg-zinc-900 cursor-pointer ${
           activeChatId === chatId ? "bg-zinc-900" : ""
         } transition-colors duration-200`}
       >
         <>
-          <Avatars
-            currLoggedUser={currLoggedUser}
-            persons={friends}
-            setConversationUsers={setConversationUsers}
-          />
+          <Avatars currLoggedUser={currLoggedUser} persons={friends} />
 
-          <div
-            onClick={() => setConversationUsers(friends)}
-            className={`flex flex-col w-full `}
-          >
+          <div className={`flex flex-col w-full `}>
             {/* Display usernames, limit based on width */}
             <div className="flex-1">
               <p className="truncate w-80 text-white">{displayUserNames}</p>

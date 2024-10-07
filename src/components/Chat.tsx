@@ -5,7 +5,7 @@ import Users from "./Users";
 
 import ChatUserSelectionPopup from "./ChatUserSelectionPopup";
 
-import { useUserContext } from "../hooks/useUserContext";
+import { useUserContext } from "@/Contexts/UserContext";
 import { socket } from "@/socket";
 import useChatContext from "../hooks/useChatContext";
 import { UserInterface } from "../Interfaces/userInterface";

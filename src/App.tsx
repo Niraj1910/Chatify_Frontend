@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import Chat from "./components/Chat";
 import { UserInterface } from "./Interfaces/userInterface";
 import { decodeTokenAPI, fetchAllUsers } from "./Services/usersAPI";
-import { useUserContext } from "./hooks/useUserContext";
+
 import Authentication from "./components/Authentication";
 import LogoutPopUp from "./components/LogoutPopUp";
+import { ChatContextProvider } from "./Contexts/ChatContext";
+import { useUserContext } from "./Contexts/UserContext";
 
 const App = () => {
   const [allusers, setAllUsers] = useState<UserInterface[]>([]);
@@ -69,7 +71,11 @@ const App = () => {
 
       {showLogout && <LogoutPopUp />}
 
-      {isAuth && <Chat allusers={allusers} />}
+      {isAuth && (
+        <ChatContextProvider>
+          <Chat allusers={allusers} />
+        </ChatContextProvider>
+      )}
     </main>
   );
 };

@@ -1,16 +1,16 @@
+import { useUserContext } from "@/Contexts/UserContext";
+
 import { UserInterface } from "@/Interfaces/userInterface";
 
 const PeopleCard = ({
   people,
-  currLoggedUser,
-  setActiveChatId,
-  setConversationUsers,
+  setUsers,
 }: {
   people: UserInterface;
-  currLoggedUser: UserInterface | null;
-  setActiveChatId: (arg: string) => void;
-  setConversationUsers: (arg: UserInterface[]) => void | null;
+  setUsers: (arg: UserInterface[]) => void;
 }) => {
+  const { currLoggedUser, setConversationUsers } = useUserContext();
+
   return (
     <div
       key={people._id}
@@ -29,8 +29,10 @@ const PeopleCard = ({
 
       <button
         onClick={() => {
-          if (currLoggedUser) setConversationUsers([currLoggedUser, people]);
-          setActiveChatId("");
+          if (currLoggedUser) {
+            setUsers([currLoggedUser, people]);
+            setConversationUsers([currLoggedUser, people]);
+          }
         }}
         className="w-20 h-14 mr-3 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white hover:bg-indigo-700 transition rounded-xl"
       >

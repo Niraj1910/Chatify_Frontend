@@ -1,4 +1,4 @@
-import { useUserContext } from "../hooks/useUserContext";
+import { useUserContext } from "@/Contexts/UserContext";
 import { UserInterface } from "@/Interfaces/userInterface";
 
 import { useState } from "react";

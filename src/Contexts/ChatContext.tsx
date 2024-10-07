@@ -1,8 +1,8 @@
-import { useUserContext } from "@/hooks/useUserContext";
 import { AllUserChatInterface } from "@/Interfaces/chatUserInterface";
 import { BASEURL } from "../../Constants";
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { timeAgo } from "@/utils/helpers";
+import { useUserContext } from "./UserContext";
 
 interface ChatContextInitial {
   AllChats: AllUserChatInterface[] | [];

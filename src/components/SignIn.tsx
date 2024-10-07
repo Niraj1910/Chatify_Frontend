@@ -2,7 +2,7 @@ import { useToast } from "../hooks/use-toast";
 
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { BASEURL, SIGN_IN } from "../../Constants";
-import { useUserContext } from "..//hooks/useUserContext";
+import { useUserContext } from "@/Contexts/UserContext";
 
 interface SignInProps {
   showPassword: boolean;

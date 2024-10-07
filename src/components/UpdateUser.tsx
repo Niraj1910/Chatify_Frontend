@@ -6,7 +6,7 @@ import { AiOutlineClose } from "react-icons/ai"; // Import the close icon
 import { BASEURL, UPDATE } from "../../Constants";
 import { toast } from "../hooks/use-toast";
 import ProfilePicture from "./ProfilePicture";
-import { useUserContext } from "../hooks/useUserContext";
+import { useUserContext } from "@/Contexts/UserContext";
 
 interface UpdateUserInterface {
   handleCloseLogoutPopUp: () => void;

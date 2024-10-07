@@ -1,11 +1,13 @@
 import { UserInterface } from "../Interfaces/userInterface";
 import { useState } from "react";
 import UsersCard from "./UsersCard";
-import { useUserContext } from "../hooks/useUserContext";
+
 import useChatContext from "../hooks/useChatContext";
 import UserHeader from "./UserHeader";
 import ChatifyHeader from "./ChatifyHeader";
 import PeopleCard from "./PeopleCard";
+import { useChatMessages } from "@/hooks/useChatMessages";
+import { useUserContext } from "@/Contexts/UserContext";
 
 const Users = ({
   allUsers,
@@ -14,18 +16,25 @@ const Users = ({
   allUsers: UserInterface[];
   handleOpenPopup: () => void;
 }) => {
-  const { currLoggedUser, setConversationUsers } = useUserContext();
   const { AllChats } = useChatContext();
 
+  const { currLoggedUser } = useUserContext();
+
+  const [users, setUsers] = useState<UserInterface[] | null>(null);
+
+  const { activeChatId } = useChatMessages({
+    currLoggedUser,
+    conversationUsers: users,
+  });
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeChatId, setActiveChatId] = useState("");
 
   const filterUsers = allUsers.filter((user) =>
     user.userName.toLocaleLowerCase().includes(searchQuery.toLocaleLowerCase())
   );
 
-  console.log("allUsers -> ", allUsers);
-  console.log("AllChats -> ", AllChats);
+  // console.log("allUsers -> ", allUsers);
+  // console.log("AllChats -> ", AllChats);
 
   return (
     <aside className="w-[30%] h-full border-r-2 border-gray-900 bg-slate-950 ">
@@ -45,12 +54,11 @@ const Users = ({
               // key={chat._id}
               key={index}
               chatId={chat._id}
-              activeChatId={activeChatId}
-              setActiveChatId={setActiveChatId}
-              setConversationUsers={setConversationUsers}
               friends={chat.participants}
               lastMessage={chat.lastMessage}
               isGroupChat={chat.isGroupChat}
+              activeChatId={activeChatId}
+              setUsers={setUsers}
             />
           ))
         ) : (
@@ -60,25 +68,13 @@ const Users = ({
         <h1 className="ml-5 my-6 font-bold text-xl">other people</h1>
         {filterUsers.length
           ? filterUsers.map((user) => (
-              <PeopleCard
-                key={user._id}
-                currLoggedUser={currLoggedUser}
-                people={user}
-                setActiveChatId={setActiveChatId}
-                setConversationUsers={setConversationUsers}
-              />
+              <PeopleCard key={user._id} people={user} setUsers={setUsers} />
             ))
           : null}
         {!filterUsers.length
           ? allUsers.length
             ? allUsers.map((user) => (
-                <PeopleCard
-                  key={user._id}
-                  currLoggedUser={currLoggedUser}
-                  people={user}
-                  setActiveChatId={setActiveChatId}
-                  setConversationUsers={setConversationUsers}
-                />
+                <PeopleCard key={user._id} people={user} setUsers={setUsers} />
               ))
             : null
           : null}

@@ -8,8 +8,9 @@ import { useEffect, useRef, useState } from "react";
 import { BASEURL } from "../../Constants";
 import { UserInterface } from "../Interfaces/userInterface";
 import useChatContext from "./useChatContext";
-import { useUserContext } from "./useUserContext";
+
 import { formatTheDate } from "@/utils/helpers";
+import { useUserContext } from "@/Contexts/UserContext";
 
 export const useChatMessages = ({
   currLoggedUser,
@@ -20,7 +21,15 @@ export const useChatMessages = ({
 }) => {
   const [messageInput, setMessageInput] = useState("");
   const [messages, setmessages] = useState<MessageInterface[] | null>(null);
-  const [chatState, setChatState] = useState<ChatInterface | null>(null);
+  const [chatState, setChatState] = useState<{
+    _id: string;
+    participants: string[];
+    messages: MessageInterface[];
+    isGroupChat: boolean;
+    createdAt: string;
+    updatedAt: string;
+  } | null>(null);
+  const [activeChatId, setActiveChatId] = useState("");
 
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -84,7 +93,7 @@ export const useChatMessages = ({
   };
 
   const getChatId = async () => {
-    console.log(`conversationUsers -> `, conversationUsers);
+    console.log(`conversationUsers from getChatId() -> `, conversationUsers);
 
     let foundChat = AllChats.find((chat) => {
       return (
@@ -113,10 +122,15 @@ export const useChatMessages = ({
     console.log("currLoggedUser -> ", currLoggedUser);
 
     const fetchChatMessages = async () => {
-      if (!currLoggedUser || !conversationUsers) return;
-      console.log("conversationUsers -> ", conversationUsers);
+      if (!conversationUsers?.length) return;
+      console.log(
+        "conversationUsers from fetchChatMessages -> ",
+        conversationUsers
+      );
+      console.log("AllChats from fetchChatMessages -> ", AllChats);
       setmessages([]);
       setChatState(null);
+      setActiveChatId("");
 
       const chatId = await getChatId();
 
@@ -150,6 +164,8 @@ export const useChatMessages = ({
           });
           setmessages(dbMessages);
           setChatState(data);
+          console.log(`chatId in fetchChatMessages -> `, chatId);
+          setActiveChatId(chatId);
         } catch (error) {
           console.log(error);
         }
@@ -220,5 +236,7 @@ export const useChatMessages = ({
     setmessages,
     chatState,
     setChatState,
+    activeChatId,
+    setActiveChatId,
   };
 };
