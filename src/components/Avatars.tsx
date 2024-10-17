@@ -13,7 +13,11 @@ const Avatars = ({
   });
 
   return (
-    <div className="flex items-center relative">
+    <div
+      className={`flex items-center relative ${
+        persons.length > 2 ? "w-20" : ""
+      } `}
+    >
       {persons?.map((person, index) =>
         persons?.length > 2 ? (
           <div
@@ -21,7 +25,7 @@ const Avatars = ({
             className={`w-14 h-14 rounded-full overflow-hidden border-2 border-gray-900 relative `}
             style={{
               zIndex: persons?.length - index,
-              marginLeft: index === 0 ? "0" : "-20%", // Show 30% overlap
+              marginLeft: index === 0 ? "0" : "-63%", // Show 30% overlap
             }}
           >
             <img
@@ -47,9 +51,9 @@ const Avatars = ({
           </div>
         ) : null
       )}
-      {remainingPersons > 0 && (
-        <span className="absolute right-10">+{remainingPersons}</span>
-      )}
+      {/* {remainingPersons > 0 && (
+        <span className="absolute left-[70px]">+{remainingPersons}</span>
+      )} */}
     </div>
   );
 };

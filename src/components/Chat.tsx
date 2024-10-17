@@ -17,9 +17,6 @@ interface ChatPropsInterface {
 const Chat: React.FC<ChatPropsInterface> = ({ allusers }) => {
   // const [allusers, setAllUsers] = useState<UserInterface[]>([]);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [selectedChatUsers, setSelectedChatUsers] = useState<UserInterface[]>(
-    []
-  );
 
   const { isAuth, showLogout, currLoggedUser } = useUserContext();
   const { setAllChats } = useChatContext();
@@ -27,13 +24,6 @@ const Chat: React.FC<ChatPropsInterface> = ({ allusers }) => {
   // Handle opening and closing the pop-up
   const handleOpenPopup = () => setIsPopupOpen(true);
   const handleClosePopup = () => setIsPopupOpen(false);
-
-  // // Handle user selection
-  // const handleSelectUsers = (selectedUsers: UserInterface[]) => {
-  //   setSelectedChatUsers(selectedUsers);
-  //   handleClosePopup();
-  //   console.log("Selected Users for Chat:", selectedUsers);
-  // };
 
   useEffect(() => {
     console.log(`currLoggedUser dependency sideEffect from Chat.tsx`);

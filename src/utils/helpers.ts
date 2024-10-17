@@ -1,3 +1,4 @@
+import { ChatStateType } from "@/Interfaces/chatUserInterface";
 import { UserInterface } from "@/Interfaces/userInterface";
 
 const extractUserNames = (
@@ -86,4 +87,53 @@ const closeTheMedia = (
   }
 };
 
-export { timeAgo, extractUserNames, formatTheDate, getFriendID, closeTheMedia };
+const videoTracks = (
+  video: React.MutableRefObject<HTMLVideoElement | null>
+) => {
+  if (video.current && video.current.srcObject) {
+    const stream = video.current.srcObject as MediaStream;
+    return stream.getVideoTracks().length > 0;
+  }
+  return false;
+};
+
+const getVideoAndDPInfo = (
+  remoteVideoRef: React.MutableRefObject<HTMLVideoElement | null>,
+  localVideoRef: React.MutableRefObject<HTMLVideoElement | null>,
+  conversationUsers: UserInterface[] | null,
+  currLoggedUser: UserInterface | null,
+  chatState: ChatStateType | null
+) => {
+  const data = {
+    remoteVideo: videoTracks(remoteVideoRef),
+    localVideo: videoTracks(localVideoRef),
+    remoteUserDP: "",
+    localUserDP: "",
+  };
+
+  const remoteUserID = getFriendID(
+    chatState?.participants,
+    currLoggedUser?._id
+  );
+
+  if (conversationUsers) {
+    if (conversationUsers[0]._id === remoteUserID) {
+      data.remoteUserDP = conversationUsers[0].avatar.url;
+      data.localUserDP = conversationUsers[1].avatar.url;
+    } else {
+      data.localUserDP = conversationUsers[0].avatar.url;
+      data.remoteUserDP = conversationUsers[1].avatar.url;
+    }
+  }
+
+  return data;
+};
+
+export {
+  getVideoAndDPInfo,
+  timeAgo,
+  extractUserNames,
+  formatTheDate,
+  getFriendID,
+  closeTheMedia,
+};

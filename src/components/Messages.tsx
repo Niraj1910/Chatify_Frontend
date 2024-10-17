@@ -28,7 +28,7 @@ const Messages = ({ handleOpenPopup }: { handleOpenPopup: () => void }) => {
       {!conversationUsers || !conversationUsers.length ? (
         <InitialChatView handleOpenPopup={handleOpenPopup} />
       ) : (
-        <main className="w-[70%] bg-slate-950 h-full p-10 flex flex-col justify-between">
+        <main className="w-[70%] bg-slate-950 h-full flex flex-col justify-between">
           <MessageNavbar
             conversationUsers={conversationUsers}
             isGroupChat={chatState?.isGroupChat}
@@ -36,7 +36,7 @@ const Messages = ({ handleOpenPopup }: { handleOpenPopup: () => void }) => {
           {messages?.length ? (
             <div
               ref={chatContainerRef}
-              className="flex flex-col justify-start  h-full gap-10 overflow-y-scroll my-7 scrollbar-hide"
+              className="flex flex-col justify-start p-10 h-full gap-10 overflow-y-scroll my-7 scrollbar-hide"
             >
               {messages.map((item, index) => (
                 <MessagesCard
@@ -58,7 +58,7 @@ const Messages = ({ handleOpenPopup }: { handleOpenPopup: () => void }) => {
               ))}
             </div>
           ) : null}
-          <div className="flex gap-6 h-14">
+          <div className="flex p-10 pt-1 gap-6 ">
             <Input
               type="text"
               value={messageInput}

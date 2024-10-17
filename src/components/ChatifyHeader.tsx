@@ -1,9 +1,10 @@
+import logo from "/logo.svg";
+
 const ChatifyHeader = () => {
   return (
-    <div className="bg-black border-b-pink-500 border-b-2 h-[13%]">
-      <h1 className="text-7xl font-playfair  font-bold bg-gradient-to-r from-pink-600 to-fuchsia-500 bg-clip-text text-transparent leading-tight p-5 ">
-        Chatify
-      </h1>
+    <div className="bg-slate-800 h-[13%] flex justify-start pl-4 items-center gap-1">
+      <img src={logo} alt="img" className="bg-white rounded-full w-20 h-20" />
+      <h1 className="text-5xl font-bold ">Chatify</h1>
     </div>
   );
 };

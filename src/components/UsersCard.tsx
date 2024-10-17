@@ -25,37 +25,17 @@ const UsersCard: React.FC<UserCardProps> = ({
 }) => {
   const { currLoggedUser, setConversationUsers } = useUserContext();
 
-  // let clickedChatId = "";
-
-  // const handleBtn = (conversationUsers: UserInterface[]) => {
-  //   clickedChatId = activeChatId;
-  // };
-
-  // const { activeChatId } = useChatMessages({
-  //   currLoggedUser,
-  //   conversationUsers: friends,
-  // });
-
   const displayUserNames = extractUserNames(friends, currLoggedUser);
-
-  // const isClicked = () => {
-  //   if (chatId && setActiveChatId) setActiveChatId(chatId);
-  // };
-
-  // console.log("activeChatId ->", activeChatId, " ", "chatId -> ", chatId);
 
   return (
     (isGroupChat || lastMessage) && (
       <div
-        // onClick={() => isClicked()}
-        // onClick={() => setConversationUsers(friends)}
-        // onClick={() => handleBtn(friends)}
         onClick={() => {
           setUsers(friends);
           setConversationUsers(friends);
         }}
-        className={`flex justify-start items-center px-4 h-20 border-b-[1px] border-gray-950 hover:bg-zinc-900 cursor-pointer ${
-          activeChatId === chatId ? "bg-zinc-900" : ""
+        className={`flex justify-start items-center px-4 h-20 border-b-[1px] border-gray-950 hover:bg-slate-800 cursor-pointer ${
+          activeChatId === chatId ? "bg-slate-800" : ""
         } transition-colors duration-200`}
       >
         <>
@@ -64,17 +44,17 @@ const UsersCard: React.FC<UserCardProps> = ({
           <div className={`flex flex-col w-full `}>
             {/* Display usernames, limit based on width */}
             <div className="flex-1">
-              <p className="truncate w-80 text-white">{displayUserNames}</p>
+              <p className="truncate w-full text-wrap text-white">
+                {displayUserNames}
+              </p>
             </div>
-
-            {/* Last message */}
 
             <div
               className={`text-gray-400 flex items-center justify-between gap-3 ${
-                isGroupChat ? "w-[70%]" : "w-full"
+                isGroupChat ? "w-full" : "w-full"
               } text-base`}
             >
-              <p className=" truncate w-[100%]">
+              <p className=" truncate w-[70%]">
                 <span>
                   {lastMessage?.sender?.userName === currLoggedUser?.userName
                     ? "You"

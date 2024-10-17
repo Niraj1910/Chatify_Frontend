@@ -1,16 +1,12 @@
-import {
-  AllUserChatInterface,
-  ChatInterface,
-  MessageInterface,
-} from "@/Interfaces/chatUserInterface";
+import { MessageInterface } from "@/Interfaces/chatUserInterface";
 import { socket } from "../socket";
 import { useEffect, useRef, useState } from "react";
-import { BASEURL } from "../../Constants";
 import { UserInterface } from "../Interfaces/userInterface";
 import useChatContext from "./useChatContext";
 
 import { formatTheDate } from "@/utils/helpers";
 import { useUserContext } from "@/Contexts/UserContext";
+import { createNewChat, fetchChatById } from "@/Services/chatMessagesAPI";
 
 export const useChatMessages = ({
   currLoggedUser,
@@ -59,63 +55,70 @@ export const useChatMessages = ({
     setMessageInput("");
   };
 
-  const handleCreateChat = async (persons: UserInterface[] | null) => {
-    if (!persons) return "";
-    try {
-      const resp = await fetch(`${BASEURL}/api/chat/new`, {
-        body: JSON.stringify(persons),
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
+  // const handleCreateChat = async (persons: UserInterface[] | null) => {
+  //   if (!persons) return "";
+  //   try {
+  //     const resp = await fetch(`${BASEURL}/api/chat/new`, {
+  //       body: JSON.stringify(persons),
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       credentials: "include",
+  //     });
 
-      const result = await resp.json();
-      console.log("result -> ", result);
+  //     const result = await resp.json();
+  //     console.log("result -> ", result);
 
-      setAllChats([
-        ...AllChats,
-        {
-          _id: result._id,
-          createdAt: result.createdAt,
-          isGroupChat: result.isGroupChat,
-          lastMessage: null,
-          participants: result.participants,
-          updatedAt: result.updatedAt,
-        },
-      ]);
-      return result._id;
-    } catch (error) {
-      console.log(error);
-      return "";
-    }
-  };
+  //     setAllChats([
+  //       ...AllChats,
+  //       {
+  //         _id: result._id,
+  //         createdAt: result.createdAt,
+  //         isGroupChat: result.isGroupChat,
+  //         lastMessage: null,
+  //         participants: result.participants,
+  //         updatedAt: result.updatedAt,
+  //       },
+  //     ]);
+  //     return result._id;
+  //   } catch (error) {
+  //     console.log(error);
+  //     return "";
+  //   }
+  // };
 
   const getChatId = async () => {
-    console.log(`conversationUsers from getChatId() -> `, conversationUsers);
-
-    let foundChat = AllChats.find((chat) => {
-      return (
+    const foundChat = AllChats.find(
+      (chat) =>
         chat.participants.length === conversationUsers?.length &&
         conversationUsers.every((user) =>
           chat.participants.some(
             (participant) => participant.userName === user.userName
           )
         )
-      );
-    })?._id;
+    )?._id;
 
-    console.log(`foundChat -> `, foundChat);
+    if (foundChat) return foundChat;
 
-    if (!foundChat) foundChat = await handleCreateChat(conversationUsers);
-
-    if (!foundChat) {
+    const newChat = await createNewChat(conversationUsers);
+    if (!newChat) {
       setConversationUsers([]);
-      throw new Error("could not get the chatId from handleCreateChat");
+      throw new Error("Could not get the chatId from handleCreateChat");
     }
 
-    return foundChat;
+    setAllChats((prev) => [
+      ...prev,
+      {
+        _id: newChat._id,
+        createdAt: newChat.createdAt,
+        isGroupChat: newChat.isGroupChat,
+        lastMessage: null,
+        participants: newChat.participants,
+        updatedAt: newChat.updatedAt,
+      },
+    ]);
+    return newChat._id;
   };
 
   useEffect(() => {
@@ -136,39 +139,26 @@ export const useChatMessages = ({
 
       console.log("chatId -> ", chatId);
 
-      if (chatId)
-        try {
-          const response = await fetch(`${BASEURL}/api/chat/${chatId}`, {
-            credentials: "include",
-          });
+      if (!chatId) return;
 
-          if (!response.ok) {
-            // delete the chatId from the AllChats array
-            setAllChats((prevChat) =>
-              prevChat.filter((chat) => chat._id !== chatId)
-            );
-            throw new Error("Could not fetch the chat messages");
-          }
+      const data = await fetchChatById(chatId);
+      if (!data) {
+        setAllChats((prev) => prev.filter((chat) => chat._id !== chatId));
+        return;
+      }
 
-          const data = await response.json();
-          const dbMessages: MessageInterface[] = [];
-          data?.messages?.map((msg) => {
-            dbMessages.push({
-              chatID: data._id,
-              message: msg.content,
-              sender_avatar_url: msg.sender.avatar.url,
-              sender_id: msg.sender._id,
-              message_id: msg._id,
-              updatedAt: formatTheDate(msg.updatedAt),
-            });
-          });
-          setmessages(dbMessages);
-          setChatState(data);
-          console.log(`chatId in fetchChatMessages -> `, chatId);
-          setActiveChatId(chatId);
-        } catch (error) {
-          console.log(error);
-        }
+      const dbMessages = data.messages.map((msg) => ({
+        chatID: data._id,
+        message: msg.content,
+        sender_avatar_url: msg.sender.avatar.url,
+        sender_id: msg.sender._id,
+        message_id: msg._id,
+        updatedAt: formatTheDate(msg.updatedAt),
+      }));
+      setmessages(dbMessages);
+      setChatState(data);
+      console.log(`chatId in fetchChatMessages -> `, chatId);
+      setActiveChatId(chatId);
     };
     fetchChatMessages();
   }, [currLoggedUser, conversationUsers, AllChats]);
