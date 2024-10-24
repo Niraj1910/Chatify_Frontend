@@ -1,7 +1,4 @@
-import {
-  AllUserChatInterface,
-  MessageInterface,
-} from "@/Interfaces/chatUserInterface";
+import { MessageInterface } from "@/Interfaces/chatUserInterface";
 import { socket } from "../socket";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { UserInterface } from "../Interfaces/userInterface";
