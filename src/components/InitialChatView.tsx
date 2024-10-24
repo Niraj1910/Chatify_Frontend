@@ -2,11 +2,21 @@ import logo from "/logo.svg";
 
 interface MessagesInterface {
   handleOpenPopup: () => void;
+  isSmallScreen: boolean;
 }
 
-const InitialChatView: React.FC<MessagesInterface> = ({ handleOpenPopup }) => {
+const InitialChatView: React.FC<MessagesInterface> = ({
+  handleOpenPopup,
+  isSmallScreen,
+}) => {
   return (
-    <main className="w-[70%] bg-slate-950 h-full p-10 flex flex-col justify-center items-center">
+    <main
+      className={`${
+        isSmallScreen
+          ? "hidden"
+          : "w-[70%] bg-slate-950 h-full p-10 flex flex-col justify-center items-center"
+      }`}
+    >
       <section>
         <div className="text-lg flex flex-col gap-4">
           <img

@@ -57,7 +57,7 @@ const ChatUserSelectionPopup: React.FC<ChatUserSelectionProps> = ({
         </div>
         <div
           className={` flex flex-col rounded-md p-3 text-lg  ${
-            selectedUsers.length && "gap-4 border-gray-500 border-2"
+            selectedUsers.length && "gap-4 border-slate-800 border-2"
           } mb-8`}
         >
           <div className="flex flex-wrap gap-4">
@@ -65,7 +65,7 @@ const ChatUserSelectionPopup: React.FC<ChatUserSelectionProps> = ({
               ? selectedUsers.map((user) => (
                   <p
                     key={user._id}
-                    className="flex bg-zinc-800 gap-2 items-center p-2 pr-4 rounded-full"
+                    className="flex bg-slate-800 gap-2 items-center p-2 pr-4 rounded-full"
                   >
                     <img
                       src={user.avatar.url}
@@ -100,7 +100,7 @@ const ChatUserSelectionPopup: React.FC<ChatUserSelectionProps> = ({
             filteredUsers.map((user) => (
               <div
                 key={user._id}
-                className="flex hover:bg-zinc-900 justify-between items-center px-4 h-20 duration-200"
+                className="flex hover:bg-slate-800 justify-between items-center px-4 h-20 duration-200"
               >
                 <div className="flex  items-center gap-3">
                   <img

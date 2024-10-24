@@ -13,6 +13,7 @@ interface UserCardProps {
   isGroupChat: boolean;
   activeChatId: string;
   setUsers: (arg: UserInterface[]) => void;
+  setshowUsersForSmallDevices: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const UsersCard: React.FC<UserCardProps> = ({
@@ -22,6 +23,7 @@ const UsersCard: React.FC<UserCardProps> = ({
   isGroupChat,
   activeChatId,
   setUsers,
+  setshowUsersForSmallDevices,
 }) => {
   const { currLoggedUser, setConversationUsers } = useUserContext();
 
@@ -33,6 +35,7 @@ const UsersCard: React.FC<UserCardProps> = ({
         onClick={() => {
           setUsers(friends);
           setConversationUsers(friends);
+          setshowUsersForSmallDevices(true);
         }}
         className={`flex justify-start items-center px-4 h-20 border-b-[1px] border-gray-950 hover:bg-slate-800 cursor-pointer ${
           activeChatId === chatId ? "bg-slate-800" : ""
@@ -41,7 +44,7 @@ const UsersCard: React.FC<UserCardProps> = ({
         <>
           <Avatars currLoggedUser={currLoggedUser} persons={friends} />
 
-          <div className={`flex flex-col w-full `}>
+          <div className={`flex flex-col w-full max-sm:w-[80%]`}>
             {/* Display usernames, limit based on width */}
             <div className="flex-1">
               <p className="truncate w-full text-wrap text-white">

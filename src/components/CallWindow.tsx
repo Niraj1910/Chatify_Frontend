@@ -1,9 +1,6 @@
-import { MessageInterface } from "@/Interfaces/chatUserInterface";
-import { UserInterface } from "@/Interfaces/userInterface";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { LuExpand, LuShrink } from "react-icons/lu";
 import CallControls from "./CallControls";
-import { getVideoAndDPInfo } from "@/utils/helpers";
 
 interface CallWindowProps {
   remoteVideoRef: React.MutableRefObject<HTMLVideoElement | null>;
@@ -13,17 +10,10 @@ interface CallWindowProps {
   isVideoCallOn: boolean;
   handleVideoCall: () => Promise<void>;
   handleEndCall: () => void;
-  currLoggedUser: UserInterface | null;
-  chatState: {
-    _id: string;
-    participants: string[];
-    messages: MessageInterface[];
-    isGroupChat: boolean;
-    createdAt: string;
-    updatedAt: string;
-  } | null;
-  conversationUsers: UserInterface[] | null;
-  localStream: MediaStream | null;
+  localUserD: string;
+  localVideoIsOn: boolean;
+  remoteUserDp: string;
+  remoteVideoIsOn: boolean;
 }
 
 const CallWindow: React.FC<CallWindowProps> = ({
@@ -34,10 +24,10 @@ const CallWindow: React.FC<CallWindowProps> = ({
   handleAudioCall,
   handleEndCall,
   handleVideoCall,
-  currLoggedUser,
-  chatState,
-  conversationUsers,
-  localStream,
+  localUserD,
+  localVideoIsOn,
+  remoteUserDp,
+  remoteVideoIsOn,
 }) => {
   const [isMinimized, setIsMinimized] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -51,29 +41,17 @@ const CallWindow: React.FC<CallWindowProps> = ({
     if (isMinimized) {
       setVideoSize({ width: "100%", height: "100%" });
     } else {
-      setVideoSize({ width: "30%", height: "60%" });
+      setVideoSize({
+        width: window.innerWidth < 1024 ? "65%" : "30%",
+        height: "60%",
+      });
     }
     setIsMinimized(!isMinimized);
   };
 
-  const getVideoAndDP = useCallback(
-    () =>
-      getVideoAndDPInfo(
-        remoteVideoRef,
-        localVideoRef,
-        conversationUsers,
-        currLoggedUser,
-        chatState
-      ),
-    [remoteVideoRef, localVideoRef, localStream]
-  );
-
-  const { remoteVideo, localVideo, remoteUserDP, localUserDP } =
-    getVideoAndDP();
-
   return (
     <div
-      className={`absolute  flex justify-center items-center bg-blue-500 ${
+      className={`absolute  flex justify-center items-center ${
         videoSize.width === "100%"
           ? "m-auto top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
           : "top-0 right-0"
@@ -98,12 +76,14 @@ const CallWindow: React.FC<CallWindowProps> = ({
         {/* Remote Video: Full size */}
         <div
           className={`bg-slate-600 ${
-            !remoteVideo ? "w-full h-full flex justify-center items-center" : ""
+            !remoteVideoIsOn
+              ? "w-full h-full flex justify-center items-center"
+              : ""
           }`}
         >
-          {!remoteVideo && conversationUsers && (
+          {!remoteVideoIsOn && (
             <img
-              src={remoteUserDP}
+              src={remoteUserDp}
               alt="img"
               className="w-20 h-20 rounded-full"
             />
@@ -116,7 +96,7 @@ const CallWindow: React.FC<CallWindowProps> = ({
             muted={false}
             playsInline
             className={`${
-              remoteVideo
+              remoteVideoIsOn
                 ? "absolute inset-0 object-cover w-full h-full"
                 : "hidden"
             } `}
@@ -124,16 +104,16 @@ const CallWindow: React.FC<CallWindowProps> = ({
         </div>
 
         {/* Local Video: Positioned top-right */}
-        <div className="absolute bg-slate-800 top-0 right-0 w-[35%] h-1/3 z-50">
+        <div className="absolute bg-slate-800 top-0 right-0 w-[35%] max-md:w-[50%] h-1/3 z-50">
           <div
             className={`relative w-full h-full ${
-              localVideo ? "" : "flex justify-center items-center"
+              localVideoIsOn ? "" : "flex justify-center items-center"
             }`}
           >
             {/* Show avatar when there's no local video */}
-            {!localVideo && (
+            {!localVideoIsOn && (
               <img
-                src={localUserDP}
+                src={localUserD}
                 alt="img"
                 className="w-14 h-14 rounded-full object-contain"
               />
@@ -147,7 +127,9 @@ const CallWindow: React.FC<CallWindowProps> = ({
               muted={true}
               playsInline
               className={`${
-                localVideo ? "w-full h-full object-cover rounded-lg" : "hidden"
+                localVideoIsOn
+                  ? "w-full h-full object-cover rounded-lg"
+                  : "hidden"
               }`}
             />
           </div>

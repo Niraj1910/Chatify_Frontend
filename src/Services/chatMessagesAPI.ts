@@ -26,17 +26,29 @@ const createNewChat = async (
   }
 };
 
+const chatCache: Record<string, ChatMessagesResponse | null> = {};
+
 const fetchChatById = async (
   chatId: string
 ): Promise<ChatMessagesResponse | null> => {
   try {
+    if (chatCache[chatId]) {
+      console.log(`Chat ${chatId} is already cached.`);
+      return chatCache[chatId]; // Return cached data directly
+    }
+
     const response = await fetch(`${BASEURL}/api/chat/${chatId}`, {
       credentials: "include",
     });
 
     if (!response.ok) throw new Error("Failed to fetch chat messages");
 
-    return await response.json();
+    const chatData: ChatMessagesResponse = await response.json();
+
+    // Cache the chat data for future requests
+    chatCache[chatId] = chatData;
+
+    return chatData;
   } catch (error) {
     console.error("Error fetching chat messages:", error);
     return null;

@@ -14,17 +14,23 @@ export const useWebRTCReciever = (
     setLocalStream,
     setCall,
     localVideoRef,
+    setLocalVideoIsOn,
+    setRemoteVideoIsOn,
+    setlocalUserDp,
+    setremoteUserDp,
   } = webRTCBase;
   const [callNotification, setCallNotification] = useState<{
     status: boolean;
     sender: string;
     offer: RTCSessionDescriptionInit | null;
     mediaType: { audio: boolean; video: boolean };
+    avatar_url: string;
   }>({
     status: false,
     sender: "",
     offer: null,
     mediaType: { audio: false, video: false },
+    avatar_url: "",
   });
 
   useEffect(() => {
@@ -35,6 +41,7 @@ export const useWebRTCReciever = (
       setCallNotification({
         status: true,
         sender: message.sender,
+        avatar_url: message.avatar_url,
         offer: message.offer,
         mediaType: message.mediaType,
       });
@@ -46,8 +53,10 @@ export const useWebRTCReciever = (
   }, [currLoggedUser]);
 
   const acceptCall = async () => {
-    const { offer, sender, mediaType } = callNotification;
+    const { offer, sender, avatar_url, mediaType } = callNotification;
     if (!offer) return;
+
+    console.log("callNotification -> ", callNotification);
 
     setCall(2);
 
@@ -77,7 +86,11 @@ export const useWebRTCReciever = (
     const answer = await peerConnection.current?.createAnswer();
     await peerConnection.current?.setLocalDescription(answer);
 
-    socket.emit("call-accept", { answer, sender });
+    socket.emit("call-accept", {
+      answer,
+      sender,
+      avatar_url: currLoggedUser?.avatar.url,
+    });
 
     console.log("audio -> ", mediaType.audio, "video -> ", mediaType.video);
 
@@ -90,7 +103,12 @@ export const useWebRTCReciever = (
       sender: "",
       offer: null,
       mediaType: { audio: false, video: false },
+      avatar_url: "",
     });
+    if (currLoggedUser) setlocalUserDp(currLoggedUser?.avatar.url);
+    setremoteUserDp(avatar_url);
+    setLocalVideoIsOn(mediaType.video);
+    setRemoteVideoIsOn(mediaType.video);
   };
 
   const rejectCall = () => {
@@ -103,6 +121,7 @@ export const useWebRTCReciever = (
       sender: "",
       offer: null,
       mediaType: { audio: false, video: false },
+      avatar_url: "",
     });
   };
 

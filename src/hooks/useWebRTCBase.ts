@@ -25,6 +25,12 @@ export const useWebRTCBase = (
   );
   const pendingCandidates = useRef<RTCIceCandidate[]>([]);
 
+  // states for local and remote user dp
+  const [remoteVideoIsOn, setRemoteVideoIsOn] = useState(false);
+  const [remoteUserDp, setremoteUserDp] = useState("");
+  const [localVideoIsOn, setLocalVideoIsOn] = useState(false);
+  const [localUserDp, setlocalUserDp] = useState("");
+
   // set up the ice-candidate exchange
   useEffect(() => {
     peerConnection.current.onicecandidate = (event) => {
@@ -177,5 +183,13 @@ export const useWebRTCBase = (
     setIsVideoCallOn,
     localVideoRef,
     remoteVideoRef,
+    localUserDp,
+    setlocalUserDp,
+    localVideoIsOn,
+    setLocalVideoIsOn,
+    remoteUserDp,
+    setremoteUserDp,
+    remoteVideoIsOn,
+    setRemoteVideoIsOn,
   };
 };

@@ -1,5 +1,4 @@
 import { useToast } from "../hooks/use-toast";
-import { signUpService } from "@/Services/authServices";
 
 import { useRef, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -23,11 +22,12 @@ const SignUp = ({
 }: SignUpProps) => {
   const [validateUsername, setValidateUsername] = useState("");
   const [imagePreview, setImagePreview] = useState(defaultProfile);
-
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    setIsLoading(!isLoading);
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
 
@@ -70,6 +70,7 @@ const SignUp = ({
       });
       console.log("Error during sign-up: ", error);
     }
+    setIsLoading(!isLoading);
   };
 
   return (
@@ -119,9 +120,12 @@ const SignUp = ({
 
       <button
         type="submit"
-        className="w-full py-3 text-white bg-indigo-600 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-300"
+        disabled={isLoading}
+        className={`w-full py-3 text-white bg-indigo-600 rounded-lg shadow-md hover:bg-indigo-700 ${
+          isLoading && "bg-indigo-700"
+        }focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-300`}
       >
-        Sign Up
+        {isLoading ? "signing up ..." : "Sign Up"}
       </button>
     </form>
   );

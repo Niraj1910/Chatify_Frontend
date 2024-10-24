@@ -19,6 +19,10 @@ export const useWebRTCCaller = (
     pendingCandidates,
     handleEndCall,
     localVideoRef,
+    setLocalVideoIsOn,
+    setRemoteVideoIsOn,
+    setlocalUserDp,
+    setremoteUserDp,
   } = webRTCBase;
 
   const initiateCall = async (audio: boolean, video: boolean) => {
@@ -49,6 +53,7 @@ export const useWebRTCCaller = (
       socket.emit(`call-req`, {
         offer,
         sender: currLoggedUser?.userName,
+        avatar_url: currLoggedUser.avatar.url,
         reciever: getFriendID(chatState.participants, currLoggedUser?._id),
         mediaType: { audio, video },
       });
@@ -59,12 +64,17 @@ export const useWebRTCCaller = (
     setIsAudioCallOn(audio);
     setIsVideoCallOn(video);
     setCall(1); // Set call state to "calling"
+    setLocalVideoIsOn(video);
+    setRemoteVideoIsOn(video);
   };
 
   const handleAcceptCall = useCallback(
-    async (answer: RTCSessionDescriptionInit) => {
-      console.log(`call-accept -> `, answer);
+    async (data: { answer: RTCSessionDescription; avatar_url: string }) => {
+      console.log(`call-accept -> `, data);
+      console.log("avatar_url -> ", data);
       setCall(2);
+
+      const { answer, avatar_url } = data;
 
       try {
         const signalingState = peerConnection.current.signalingState;
@@ -82,6 +92,10 @@ export const useWebRTCCaller = (
             }
             pendingCandidates.current = []; // Clear the queue after adding
           }
+
+          if (currLoggedUser) setlocalUserDp(currLoggedUser.avatar.url);
+          setremoteUserDp(avatar_url);
+          setremoteUserDp;
         } else if (signalingState === "stable") {
           console.warn(
             "Already in stable state, skipping setRemoteDescription."

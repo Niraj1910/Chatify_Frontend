@@ -1,5 +1,10 @@
-import { ChatStateType } from "@/Interfaces/chatUserInterface";
+import {
+  AllUserChatInterface,
+  ChatStateType,
+  MessageInterface,
+} from "@/Interfaces/chatUserInterface";
 import { UserInterface } from "@/Interfaces/userInterface";
+import { createNewChat } from "@/Services/chatMessagesAPI";
 
 const extractUserNames = (
   conversationUsers: UserInterface[],
@@ -54,6 +59,8 @@ const timeAgo = (isoDateString: string) => {
 };
 
 const formatTheDate = (dateString: string) => {
+  // console.log(`formatTheDate -> `, dateString);
+
   const date = new Date(dateString);
 
   const day = String(date.getDate()).padStart(2, "0"); // Get day
@@ -62,8 +69,9 @@ const formatTheDate = (dateString: string) => {
 
   const hours = String(date.getHours()).padStart(2, "0"); // Get hours
   const minutes = String(date.getMinutes()).padStart(2, "0"); // Get minutes
-
-  return `${day} ${month} ${year} ${hours}:${minutes}`;
+  const finalDate = `${day} ${month} ${year} ${hours}:${minutes}`;
+  // console.log("finalDate -> ", finalDate);
+  return finalDate;
 };
 
 const getFriendID = (arr: string[] | undefined, friend: string | undefined) => {
@@ -129,6 +137,102 @@ const getVideoAndDPInfo = (
   return data;
 };
 
+const getChatDate = (
+  chat: MessageInterface,
+  index: number,
+  messages: MessageInterface[]
+) => {
+  return index === 0
+    ? chat.updatedAt.slice(0, chat.updatedAt.length - 5)
+    : messages[index - 1].updatedAt.slice(0, chat.updatedAt.length - 5) ===
+      chat.updatedAt.slice(0, chat.updatedAt.length - 5)
+    ? ""
+    : chat.updatedAt.slice(0, chat.updatedAt.length - 5);
+};
+
+const getChatId = async (
+  AllChats: [] | AllUserChatInterface[],
+  conversationUsers: UserInterface[] | null,
+  setConversationUsers: (
+    value: React.SetStateAction<UserInterface[] | null>
+  ) => void,
+  setAllChats: (
+    value: React.SetStateAction<[] | AllUserChatInterface[]>
+  ) => void
+) => {
+  const foundChat = AllChats.find(
+    (chat) =>
+      chat.participants.length === conversationUsers?.length &&
+      conversationUsers.every((user) =>
+        chat.participants.some(
+          (participant) => participant.userName === user.userName
+        )
+      )
+  )?._id;
+
+  if (foundChat) return foundChat;
+
+  const newChat = await createNewChat(conversationUsers);
+  if (!newChat) {
+    setConversationUsers([]);
+    throw new Error("Could not get the chatId from handleCreateChat");
+  }
+
+  setAllChats((prev) => [
+    ...prev,
+    {
+      _id: newChat._id,
+      createdAt: newChat.createdAt,
+      isGroupChat: newChat.isGroupChat,
+      lastMessage: null,
+      participants: newChat.participants,
+      updatedAt: newChat.updatedAt,
+    },
+  ]);
+  return newChat._id;
+};
+
+const updateAllChats = (
+  msgDetails: {
+    chatId: string;
+    message: string;
+    sender_avatar_url: string;
+    sender: { _id: string };
+    updatedAt: string;
+  },
+  setAllChats: (
+    value: React.SetStateAction<[] | AllUserChatInterface[]>
+  ) => void
+) => {
+  setAllChats((prevChats) => {
+    const updatedChats = prevChats.map((chat) => {
+      if (chat._id === msgDetails.chatId) {
+        return {
+          ...chat,
+          lastMessage: {
+            content: msgDetails.message,
+            createdAt: "1 min",
+            _id: "XXXXXX",
+            sender: msgDetails.sender,
+          },
+        };
+      }
+      return chat;
+    }) as AllUserChatInterface[];
+
+    const updatedChat = updatedChats.find(
+      (chat) => chat._id === msgDetails.chatId
+    );
+    if (!updatedChat) return updatedChats;
+
+    const remainingChats = updatedChats.filter(
+      (chat) => chat._id !== msgDetails.chatId
+    );
+
+    return [updatedChat, ...remainingChats];
+  });
+};
+
 export {
   getVideoAndDPInfo,
   timeAgo,
@@ -136,4 +240,7 @@ export {
   formatTheDate,
   getFriendID,
   closeTheMedia,
+  getChatDate,
+  getChatId,
+  updateAllChats,
 };

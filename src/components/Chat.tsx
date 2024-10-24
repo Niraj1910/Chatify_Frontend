@@ -17,7 +17,9 @@ interface ChatPropsInterface {
 const Chat: React.FC<ChatPropsInterface> = ({ allusers }) => {
   // const [allusers, setAllUsers] = useState<UserInterface[]>([]);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-
+  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 1024);
+  const [showUsersForSmallDevices, setshowUsersForSmallDevices] =
+    useState(false);
   const { isAuth, showLogout, currLoggedUser } = useUserContext();
   const { setAllChats } = useChatContext();
 
@@ -26,12 +28,17 @@ const Chat: React.FC<ChatPropsInterface> = ({ allusers }) => {
   const handleClosePopup = () => setIsPopupOpen(false);
 
   useEffect(() => {
-    console.log(`currLoggedUser dependency sideEffect from Chat.tsx`);
+    const handleResize = () => setIsSmallScreen(window.innerWidth < 1024);
+    window.addEventListener("resize", handleResize);
 
-    if (currLoggedUser?.userName) {
-      console.log("Joining with username:", currLoggedUser.userName);
-      socket.emit("join", currLoggedUser._id);
-    }
+    handleResize();
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    socket.emit("join", currLoggedUser?._id);
 
     socket.on("online-users", (onlineUsers) => {
       console.log("onlineUsers -> ", onlineUsers);
@@ -58,8 +65,6 @@ const Chat: React.FC<ChatPropsInterface> = ({ allusers }) => {
   }, [currLoggedUser]);
 
   useEffect(() => {
-    console.log(`empty dependency sideEffect from Chat.tsx`);
-
     socket.connect();
 
     return () => {
@@ -85,10 +90,21 @@ const Chat: React.FC<ChatPropsInterface> = ({ allusers }) => {
           }`}
         >
           {/* display all users */}
-          <Users allUsers={allusers} handleOpenPopup={handleOpenPopup} />
+          <Users
+            allUsers={allusers}
+            handleOpenPopup={handleOpenPopup}
+            isSmallScreen={isSmallScreen}
+            showUsersForSmallDevices={showUsersForSmallDevices}
+            setshowUsersForSmallDevices={setshowUsersForSmallDevices}
+          />
 
           {/* display all messages */}
-          <Messages handleOpenPopup={handleOpenPopup} />
+          <Messages
+            handleOpenPopup={handleOpenPopup}
+            isSmallScreen={isSmallScreen}
+            showUsersForSmallDevices={showUsersForSmallDevices}
+            setshowUsersForSmallDevices={setshowUsersForSmallDevices}
+          />
         </div>
       )}
     </section>

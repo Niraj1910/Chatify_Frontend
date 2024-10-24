@@ -1,49 +1,90 @@
 import { UserInterface } from "@/Interfaces/userInterface";
 import { extractUserNames } from "@/utils/helpers";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MdClose, MdKeyboardArrowRight } from "react-icons/md";
 import Avatars from "./Avatars";
 import { useUserContext } from "@/Contexts/UserContext";
 import CallActions from "./CallActions";
+import { FaAngleLeft, FaAnglesLeft } from "react-icons/fa6";
 
 interface MessageNavbarProps {
   conversationUsers: UserInterface[];
   isGroupChat: boolean | undefined;
+  isSmallScreen: boolean;
+  showUsersForSmallDevices: boolean;
+  setshowUsersForSmallDevices: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const MessageNavbar: React.FC<MessageNavbarProps> = ({
   conversationUsers,
   isGroupChat,
+  isSmallScreen,
+  showUsersForSmallDevices,
+  setshowUsersForSmallDevices,
 }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const { currLoggedUser, setConversationUsers } = useUserContext();
+  const [isCallOn, setisCallOn] = useState(0);
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   const displayUserNames = extractUserNames(conversationUsers, currLoggedUser);
 
+  const handleShowUsersForSmallDevices = () =>
+    setshowUsersForSmallDevices(false);
+
   return (
     <>
-      <nav className="bg-slate-800 flex justify-between items-center px-10 py-[60px] h-20">
-        <Avatars currLoggedUser={currLoggedUser} persons={conversationUsers} />
+      <nav
+        className={`${
+          showUsersForSmallDevices
+            ? "bg-slate-800 flex justify-between items-center px-10 py-[60px] h-20"
+            : ""
+        }  `}
+      >
+        {isSmallScreen && (
+          <FaAnglesLeft
+            onClick={handleShowUsersForSmallDevices}
+            className="w-6 h-6 text-white mr-3 cursor-pointer max-md:"
+          />
+        )}
+        {showUsersForSmallDevices && (
+          <Avatars
+            currLoggedUser={currLoggedUser}
+            persons={conversationUsers}
+          />
+        )}
 
         {/* Display usernames, limit based on width */}
-        <div className="flex-1">
-          <p className="flex items-center truncate w-96 text-white">
-            {displayUserNames}{" "}
-            {isGroupChat && (
-              <MdKeyboardArrowRight
-                onClick={toggleSidebar}
-                className="w-10 h-8 cursor-pointer"
-              />
-            )}
-          </p>
-        </div>
-
-        <CallActions />
+        {showUsersForSmallDevices && (
+          <div className="flex-1">
+            <p
+              onClick={() => isGroupChat && toggleSidebar()}
+              className={`flex items-center truncate w-96 max-md:w-6 max-sm:w-28 text-wrap text-white ${
+                isGroupChat && "cursor-pointer"
+              }`}
+            >
+              {displayUserNames}{" "}
+              {isGroupChat && (
+                <MdKeyboardArrowRight className="w-10 h-8 max-sm:w-6 max-sm:h-4" />
+              )}
+            </p>
+          </div>
+        )}
+        {isGroupChat ? (
+          isCallOn !== 0 && (
+            <CallActions
+              showUsersForSmallDevices={showUsersForSmallDevices}
+              setisCallOn={setisCallOn}
+            />
+          )
+        ) : (
+          <CallActions
+            showUsersForSmallDevices={showUsersForSmallDevices}
+            setisCallOn={setisCallOn}
+          />
+        )}
       </nav>
 
       {/* Sliding Sidebar */}

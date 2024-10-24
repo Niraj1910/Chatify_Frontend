@@ -72,7 +72,7 @@ const UpdateUser: React.FC<UpdateUserInterface> = ({
     <>
       <button
         onClick={handleCloseLogoutPopUp}
-        className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
+        className="absolute top-2 right-2 text-white hover:text-gray-800"
       >
         <AiOutlineClose className="w-6 h-6" />
       </button>
@@ -84,9 +84,7 @@ const UpdateUser: React.FC<UpdateUserInterface> = ({
 
       {/* Styled Labels and Inputs */}
       <div className="w-full space-y-2">
-        <label className="block text-lg font-medium text-gray-700">
-          Username
-        </label>
+        <label className="block text-lg font-medium text-white">Username</label>
         <Input
           value={userNameInput}
           name="userName"
@@ -95,7 +93,7 @@ const UpdateUser: React.FC<UpdateUserInterface> = ({
           className="text-lg rounded-lg outline-none  border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
         />
 
-        <label className="block text-lg font-medium text-gray-700">Email</label>
+        <label className="block text-lg font-medium text-white">Email</label>
         <Input
           value={emailInput}
           name="email"
@@ -110,7 +108,7 @@ const UpdateUser: React.FC<UpdateUserInterface> = ({
         disabled={canUpdate()}
         className={`w-24 text-lg py-3 rounded-lg shadow-md text-white ${
           canUpdate()
-            ? "bg-indigo-200"
+            ? "bg-indigo-300"
             : "bg-indigo-600  hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-300"
         }`}
       >
