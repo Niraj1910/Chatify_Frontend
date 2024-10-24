@@ -7,7 +7,7 @@ const Avatars = ({
   persons: UserInterface[];
   currLoggedUser: UserInterface | null;
 }) => {
-  const remainingPersons = persons.length - 3;
+  // const remainingPersons = persons.length - 3;
   persons = persons.filter((person, index) => {
     if (index < 3) return person;
   });

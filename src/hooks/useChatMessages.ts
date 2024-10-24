@@ -95,7 +95,14 @@ export const useChatMessages = ({
       updatedAt: formatTheDate(msg.updatedAt),
     }));
     setmessages(dbMessages);
-    setChatState(data);
+    setChatState({
+      _id: data._id,
+      createdAt: data.createdAt,
+      isGroupChat: data.isGroupChat,
+      messages: dbMessages,
+      participants: data.participants,
+      updatedAt: data.updatedAt,
+    });
     console.log(`chatId in fetchChatMessages -> `, chatId);
     setActiveChatId(chatId);
     setIsLoading(false);

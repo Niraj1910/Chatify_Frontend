@@ -1,11 +1,11 @@
 import { UserInterface } from "@/Interfaces/userInterface";
 import { extractUserNames } from "@/utils/helpers";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { MdClose, MdKeyboardArrowRight } from "react-icons/md";
 import Avatars from "./Avatars";
 import { useUserContext } from "@/Contexts/UserContext";
 import CallActions from "./CallActions";
-import { FaAngleLeft, FaAnglesLeft } from "react-icons/fa6";
+import { FaAnglesLeft } from "react-icons/fa6";
 
 interface MessageNavbarProps {
   conversationUsers: UserInterface[];

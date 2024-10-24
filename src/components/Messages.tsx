@@ -7,7 +7,6 @@ import MessageNavbar from "./MessageNavbar";
 import MessagesCard from "./MessagesCard";
 import { useChatMessages } from "@/hooks/useChatMessages";
 import { getChatDate } from "@/utils/helpers";
-import { useState } from "react";
 import { RiRefreshLine } from "react-icons/ri";
 
 const Messages = ({
