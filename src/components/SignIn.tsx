@@ -61,7 +61,7 @@ const SignIn = ({ showPassword, setShowPassword }: SignInProps) => {
       <input
         type="text"
         name="userName"
-        placeholder="Username"
+        placeholder="Guts"
         className="w-full px-4 py-3 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
       />
 
@@ -69,7 +69,7 @@ const SignIn = ({ showPassword, setShowPassword }: SignInProps) => {
         <input
           name="password"
           type={showPassword ? "text" : "password"}
-          placeholder="Password"
+          placeholder="12345"
           className="w-full px-4 py-3 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
         <div

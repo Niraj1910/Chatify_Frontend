@@ -49,7 +49,7 @@ const CallNotification: React.FC<CallNotificationProps> = ({
   return (
     <>
       {callNotification.status && (
-        <div className="absolute left-1/4 -translate-x-1/2 transform  top-10 w-96 flex justify-between items-center p-4 rounded-full bg-white shadow-lg text-black z-50 animate-shake">
+        <div className="absolute left-1/4 -translate-x-1/2 transform  top-10 w-96 max-sm:left-1/2 flex justify-between items-center p-4 rounded-full bg-white shadow-lg text-black z-50 max-sm:animate-none animate-shake">
           {/* Ringtone */}
           <audio ref={ringtoneRef} src={chatifyRingtone} loop autoPlay />
           <p>{callNotification.sender} is calling...</p>
